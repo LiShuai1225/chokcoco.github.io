@@ -1112,12 +1112,10 @@ code {
     .footer__copyright a:hover {
       color: #006699; }
 
-.avatar,
-.logo {
-  border-radius: 50%;
-  border: 3px solid #FFF;
-  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3); }
-
+.logo{
+  width: 150px;
+  cursor:pointer;
+}
 hr {
   border: none; }
 
