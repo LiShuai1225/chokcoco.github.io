@@ -197,9 +197,9 @@
     
       <category term="性能优化" scheme="http://sbco.cc/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"/>
     
-      <category term="javascript" scheme="http://sbco.cc/tags/javascript/"/>
-    
       <category term="编码技巧" scheme="http://sbco.cc/tags/%E7%BC%96%E7%A0%81%E6%8A%80%E5%B7%A7/"/>
+    
+      <category term="javascript" scheme="http://sbco.cc/tags/javascript/"/>
     
   </entry>
   
@@ -822,9 +822,9 @@
     </summary>
     
     
-      <category term="编码技巧" scheme="http://sbco.cc/tags/%E7%BC%96%E7%A0%81%E6%8A%80%E5%B7%A7/"/>
-    
       <category term="URL" scheme="http://sbco.cc/tags/URL/"/>
+    
+      <category term="编码技巧" scheme="http://sbco.cc/tags/%E7%BC%96%E7%A0%81%E6%8A%80%E5%B7%A7/"/>
     
   </entry>
   
