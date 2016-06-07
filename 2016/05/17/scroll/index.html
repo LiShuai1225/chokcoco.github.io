@@ -28,7 +28,7 @@
 <meta property="og:image" content="http://images2015.cnblogs.com/blog/608782/201605/608782-20160516205933748-797476534.gif">
 <meta property="og:image" content="http://images2015.cnblogs.com/blog/608782/201605/608782-20160516214245123-1124441228.jpg">
 <meta property="og:image" content="http://images2015.cnblogs.com/blog/608782/201605/608782-20160517194417998-1526294600.jpg">
-<meta property="og:updated_time" content="2016-06-06T02:13:22.757Z">
+<meta property="og:updated_time" content="2016-06-07T08:55:00.532Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="【前端性能】高性能滚动 scroll 及页面渲染优化 | Coco ’s blog">
 <meta name="twitter:description" content="最近在研究页面渲染及web动画的性能问题，以及拜读《CSS SECRET》（CSS揭秘）这本大作。
@@ -75,7 +75,7 @@
                 <li class="navigation__item"><a href="/#blog" title="" class="blog-button">首页</a></li>
               
                 
-                <li class="navigation__item"><a href="/about" title="" class="">关于</a></li>
+                <li class="navigation__item"><a href="/about/html/" title="" class="">关于</a></li>
               
                 
                 <li class="navigation__item"><a href="/archive" title="" class="">归档</a></li>
@@ -165,7 +165,7 @@ classes that you can use:
     <p>最近在研究页面渲染及web动画的性能问题，以及拜读<a href="https://github.com/cssmagic/CSS-Secrets" target="_blank" rel="external">《CSS SECRET》</a>（CSS揭秘）这本大作。</p>
 <p>本文主要想谈谈页面优化之滚动优化。</p>
 <p>主要内容包括了为何需要优化滚动事件，滚动与页面渲染的关系，节流与防抖，pointer-events:none 优化滚动。因为本文涉及了很多很多基础，可以对照上面的知识点，选择性跳到相应地方阅读。<a id="more"></a></p>
-<h2 id="滚动优化的由来"><a href="#滚动优化的由来" class="headerlink" title="滚动优化的由来"></a>滚动优化的由来</h2><p>滚动优化其实也不仅仅指滚动（scroll 事件），还包括了例如 resize 这类会频繁触发的事件。简单的看看：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'scroll'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(i++);</span><br><span class="line">&#125;,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
+<h2 id="滚动优化的由来"><a href="#滚动优化的由来" class="headerlink" title="滚动优化的由来"></a>滚动优化的由来</h2><p>滚动优化其实也不仅仅指滚动（scroll 事件），还包括了例如 resize 这类会频繁触发的事件。简单的看看：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i = <span class="number">0</span>;</span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'scroll'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(i++);</span><br><span class="line">&#125;,<span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
 <p>输出如下：</p>
 <p><img src="http://images2015.cnblogs.com/blog/608782/201605/608782-20160516205933748-797476534.gif" alt=""></p>
 <p>在绑定 scroll 、resize 这类事件时，当它发生时，它被触发的频次非常高，间隔很近。如果事件中涉及到大量的位置计算、DOM 操作、元素重绘等工作且这些工作无法在下一个 scroll 事件触发前完成，就会造成浏览器掉帧。加之用户鼠标滚动往往是连续的，就会持续触发 scroll 事件导致掉帧扩大、浏览器 CPU 使用率增加、用户体验受到影响。</p>
