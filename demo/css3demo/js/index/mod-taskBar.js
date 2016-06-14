@@ -1,10 +1,1 @@
-define('index/mod-taskBar', ['jquery'],function($){
-
-	return{
-		init:function(){
-			console.log($);
-
-		}
-	}
-})
-
+define("index/mod-taskBar",["jquery"],function(n){return{init:function(){console.log(n)}}});
