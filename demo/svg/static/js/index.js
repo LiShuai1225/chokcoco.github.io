@@ -1,1 +1,17 @@
-(function(n,i){function o(){var n=$("li"),i=n.length,o=0;for(;o<i;o++){var t=n.eq(o),c=t.text().split("#")[1];t.find("div").css("background-color","#"+c)}}o()})(window);
+(function(window, undefined) {
+
+	function setColor(){
+		var lis = $('li'),
+			length = lis.length,
+			i = 0;
+
+		for(; i<length; i++){
+			var elem = lis.eq(i),
+				color = elem.text().split('#')[1];
+
+			elem.find('div').css('background-color','#'+color);
+		}
+	}
+
+	setColor();
+})(window);
