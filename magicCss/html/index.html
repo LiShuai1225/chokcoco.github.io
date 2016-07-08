@@ -1892,7 +1892,7 @@
     <!-- wave 利用背景图实现波浪水纹效果 -->
     <section id="wave" class="code-wrap cf">
       <div class="css-live-wrap">
-        <summary>波浪水纹效果(单标签实现)</summary>
+        <summary>波浪水纹效果（单标签实现）</summary>
         <summary>利用 background-size 、缩放、背景图 实现</summary>
         <summary>如果没有单标签的限制，可以制作多道波纹，效果更真实</summary>
         <hgroup class="wave">
@@ -1917,36 +1917,129 @@
         }
         .wave::before{
           z-index:2;
-          background-size:cover 100%;
           animation:wave 2s ease-out infinite;
           -webkit-animation:wave 2s ease-out infinite;
         }
         .wave::after{
           z-index:3;
-          background-size:cover 100%;
           animation:wave 2s ease-out .2s infinite;
           -webkit-animation:wave 2s ease-out .2s infinite;
         }
-        @-webkit-keyframes wave{
+        @keyframes wave{
           0%{
             top: 50%;left: 50%;
-            transform: translate(-50%, -50%) scale(1.6);
+            transform: translate(-50%, -50%) scale(1.4);
             width:30px;
             height:30px;
           }
           50%{
             top: 50%;left: 50%;
             transform: translate(-50%, -50%) scale(1);
-            width:200px;
-            height:200px;
+            width:240px;
+            height:240px;
           }
           100%{
             top: 50%;left: 50%;
             transform: translate(-50%, -50%) scale(1);
-            width:200px;
-            height:200px;
+            width:240px;
+            height:240px;
           }
         }
+        @-webkit-keyframes wave{
+          0%{
+            top: 50%;left: 50%;
+            -webkit-transform: translate(-50%, -50%) scale(1.4);
+            width:30px;
+            height:30px;
+          }
+          50%{
+            top: 50%;left: 50%;
+            -webkit-transform: translate(-50%, -50%) scale(1);
+            width:240px;
+            height:240px;
+          }
+          100%{
+            top: 50%;left: 50%;
+            -webkit-transform: translate(-50%, -50%) scale(1);
+            width:240px;
+            height:240px;
+          }
+        }
+      </style>
+    </section>
+
+    <!-- filter-mix 利用滤镜实现混合效果 -->
+    <section id="filter-mix" class="code-wrap cf">
+      <div class="css-live-wrap">
+        <summary>利用滤镜实现混合效果（单标签实现）</summary>
+        <summary>利用 fliter:blur() 、filter:contrast() 实现</summary>
+        <hgroup class="filter-mix">
+        </hgroup>
+      </div>
+      <style class="code" contenteditable=true>
+        .filter-mix{
+          position: absolute;
+          top: 50%;left: 50%;
+          transform: translate(-50%, -50%);
+          width: 300px;height: 200px;
+          -webkit-filter:contrast(20);
+          background:#fff;
+        }
+        .filter-mix::before{
+          content:"";
+          position: absolute;
+          width:120px;
+          height:120px;
+          border-radius: 50%;
+          background:#333;
+          top:40px;
+          left:0px;
+          z-index:2;
+          -webkit-filter:blur(6px);
+          box-sizing:border-box;
+          animation:filterBallMove 10s ease-out infinite;
+          -webkit-animation:filterBallMove 10s ease-out infinite;
+        }
+        .filter-mix::after{
+          content:"";
+          position: absolute;
+          width:80px;
+          height:80px;
+          border-radius: 50%;
+          background:#3F51B5;
+          top:60px;
+          right:0px;
+          z-index:2;
+          -webkit-filter:blur(6px);
+          animation:filterBallMove2 10s ease-out infinite;
+          -webkit-animation:filterBallMove2 10s ease-out infinite;
+
+        }
+
+        @keyframes filterBallMove{
+          50%{
+            left:200px;
+          }
+        }
+
+        @-webkit-keyframes filterBallMove{
+          50%{
+            left:200px;
+          }
+        }
+
+        @keyframes filterBallMove2{
+          50%{
+            right:200px;
+          }
+        }
+
+        @-webkit-keyframes filterBallMove2{
+          50%{
+            right:200px;
+          }
+        }
+
       </style>
     </section>
   </div>
