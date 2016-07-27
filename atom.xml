@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://sbco.cc/"/>
-  <updated>2016-07-13T10:11:09.900Z</updated>
+  <updated>2016-07-27T09:07:46.303Z</updated>
   <id>http://sbco.cc/</id>
   
   <author>
@@ -16,130 +16,35 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>shadow-dom 浅析</title>
+    <link href="http://sbco.cc/2016/07/27/shadowDom/"/>
+    <id>http://sbco.cc/2016/07/27/shadowDom/</id>
+    <published>2016-07-27T08:29:34.000Z</published>
+    <updated>2016-07-27T09:07:46.303Z</updated>
+    
+    <content type="html">&lt;p&gt;说到 shadow-dom 可能很多人会很陌生。但是其实我们肯定碰到过，本文主要想简单介绍下 &lt;code&gt;shadow-dom&lt;/code&gt;。下面直接进入正文。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;&lt;h2 id=&quot;shadow-dom-是什么&quot;&gt;&lt;a href=&quot;#shadow-dom-是什么&quot; class=&quot;headerlink&quot; title=&quot;shadow-dom 是什么&quot;&gt;&lt;/a&gt;shadow-dom 是什么&lt;/h2&gt;&lt;p&gt;顾名思义， &lt;code&gt;shadow-dom&lt;/code&gt;，直译的话就是 &lt;code&gt;影子dom&lt;/code&gt; ？我觉得可以理解为潜藏在黑暗中的 DOM 结构，也就是我们无法直接控制操纵的 DOM 结构。&lt;/p&gt;&lt;p&gt;前端同学经常用开发者工具的话，查看 DOM 结构的时候，肯定看到过下面这样的结构：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165024184-2034640875.jpg&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;p&gt;这里的 &lt;code&gt;#shadow-root&lt;/code&gt; 所包含的内容其实就是所谓的 &lt;code&gt;shadow-dom&lt;/code&gt; 。&lt;/p&gt;&lt;p&gt;&lt;code&gt;shadow-dom&lt;/code&gt; 其实是浏览器的一种能力，它允许在浏览器渲染（paint）文档（document）的时候向其中的 Dom 结构中插入一棵 DOM 元素子树，但是特殊的是，这棵子树（shadow-dom）并不在主 DOM 树中。&lt;/p&gt;&lt;p&gt;举个栗子，也是最常见的例子， &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 标签，我们创建在页面上创建一个空白的 &lt;code&gt;video&lt;/code&gt; 标签： &lt;code&gt;&amp;lt;video id=&amp;#39;test&amp;#39;&amp;gt;&amp;lt;/video&amp;gt;&lt;/code&gt;。&lt;/p&gt;&lt;p&gt;查看 DOM 结构如下：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165124138-1684239797.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;p&gt;虽然我们创建的是一个空标签，但是在这个空标签内部，存在一个 &lt;code&gt;shadow-dom&lt;/code&gt; ，点开 &lt;code&gt;shadow-dom&lt;/code&gt; 可以看到内有乾坤，大有内容。其实这内部的具体内容，就是 &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 的具体实现。&lt;/p&gt;&lt;h3 id=&quot;shadow-dom-结构示意&quot;&gt;&lt;a href=&quot;#shadow-dom-结构示意&quot; class=&quot;headerlink&quot; title=&quot;shadow-dom 结构示意&quot;&gt;&lt;/a&gt;shadow-dom 结构示意&lt;/h3&gt;&lt;p&gt;再用一幅图总结一下：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165150466-1435685918.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;h4 id=&quot;document&quot;&gt;&lt;a href=&quot;#document&quot; class=&quot;headerlink&quot; title=&quot;document&quot;&gt;&lt;/a&gt;document&lt;/h4&gt;&lt;p&gt;这个很好理解，就是我们的正常文档 document 。&lt;/p&gt;&lt;h4 id=&quot;shadow-host&quot;&gt;&lt;a href=&quot;#shadow-host&quot; class=&quot;headerlink&quot; title=&quot;shadow host&quot;&gt;&lt;/a&gt;shadow host&lt;/h4&gt;&lt;p&gt;对于一个内部有 &lt;code&gt;shadow-dom&lt;/code&gt; 的元素而言，它必然需要一个宿主元素，对于上面的例子而言， &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 标签，就是 shadow-dom 的宿主元素。&lt;/p&gt;&lt;h4 id=&quot;shadow-root&quot;&gt;&lt;a href=&quot;#shadow-root&quot; class=&quot;headerlink&quot; title=&quot;shadow-root&quot;&gt;&lt;/a&gt;shadow-root&lt;/h4&gt;&lt;p&gt;通过 &lt;code&gt;createShadowRoot&lt;/code&gt;(下文会提及) 返回的文档片段被称为 shadow-root 。它和它的后代元素，都将对用户隐藏，但是它们是实际存在的，在 chrome 中，我们可以通常审查元素去查看它们的具体 DOM 实现。&lt;/p&gt;&lt;p&gt;在 &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 中，例如暂停，播放，音量控制，全屏按钮，进度条等都是 shadow-root 的后代。它们工作时会显示在屏幕上，但他们的 DOM 结构对用户是不可见的。&lt;/p&gt;&lt;h4 id=&quot;contents&quot;&gt;&lt;a href=&quot;#contents&quot; class=&quot;headerlink&quot; title=&quot;contents&quot;&gt;&lt;/a&gt;contents&lt;/h4&gt;&lt;p&gt;就是上述所说的 &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 中各子组件的 DOM 的具体实现。&lt;/p&gt;&lt;h2 id=&quot;为什么需要-shadow-dom&quot;&gt;&lt;a href=&quot;#为什么需要-shadow-dom&quot; class=&quot;headerlink&quot; title=&quot;为什么需要 shadow-dom&quot;&gt;&lt;/a&gt;为什么需要 shadow-dom&lt;/h2&gt;&lt;p&gt;为什么需要有这种结构呢？&lt;/p&gt;&lt;p&gt;Shadow-dom 是游离在 DOM 树之外的节点树，但是他的创建基于普通 DOM 元素（非 document），并且创建后的 Shadow-dom 节点可以从界面上直观的看到。更重要的是，Shadow-dom 具有良好的密封性。&lt;/p&gt;&lt;p&gt;这是浏览器提供的一种“封装”功能，提供了一种强大的技术去隐藏一些实现细节。什么意思呢？以 &lt;a href=&quot;http://www.w3school.com.cn/tiy/t.asp?f=html5_video&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;w3c&lt;/a&gt; 上的一个 &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 例子为例，我们仅仅是填写了一个空白的标签，再加上 &lt;code&gt;src&lt;/code&gt; 属性里填上视频地址，就可以播放视频了：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165222763-290711988.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;p&gt;我们仅仅填写了一行代码，却拥有比这行代码更多的功能，譬如暂停，播放，音量控制，全屏按钮，进度条等等。&lt;/p&gt;&lt;p&gt;这些功能具体的 DOM 实现，其实都在 &lt;code&gt;shadow-dom&lt;/code&gt; 中：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165253247-953436276.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;p&gt;浏览器的开发者们意识到作为前端开发者，引用一个 &lt;code&gt;&amp;lt;video&amp;gt;&lt;/code&gt; 标签的时候，每次还要写入一大堆 DOM 去控制控件的表现和行为，既不简洁也很困难。所以他们界定了这样一个界限，界定了哪些是你可以访问的，哪些实现细节是访问不到的。&lt;/p&gt;&lt;p&gt;那些不希望我们访问到的细节，则封装在了 &lt;code&gt;shadow-dom&lt;/code&gt; 中。然而，浏览器本身却可以随意跨越这个边界。设置这样一个边界之后，浏览器的开发者们就可以在我们看不见的地方使用熟悉的web技术、同样的HTML元素去创建更多的功能，而不是像我们一样要在页面上用div和span来堆砌这些元素。&lt;/p&gt;&lt;h2 id=&quot;如何控制-shadow-dom&quot;&gt;&lt;a href=&quot;#如何控制-shadow-dom&quot; class=&quot;headerlink&quot; title=&quot;如何控制 shadow-dom&quot;&gt;&lt;/a&gt;如何控制 shadow-dom&lt;/h2&gt;&lt;p&gt;既然是浏览器开发者有意隐藏起来的 DOM 结构，那么我们是否可以控制内部的 DOM 结构呢？并非完全不可以，还是有一些方法使得我们可以控制 &lt;code&gt;shadow-dom&lt;/code&gt; 内的一些表现。&lt;/p&gt;&lt;h3 id=&quot;使用伪元素控制-shadow-dom-样式&quot;&gt;&lt;a href=&quot;#使用伪元素控制-shadow-dom-样式&quot; class=&quot;headerlink&quot; title=&quot;使用伪元素控制 shadow-dom 样式&quot;&gt;&lt;/a&gt;使用伪元素控制 shadow-dom 样式&lt;/h3&gt;&lt;p&gt;这里我们要使用到伪元素，通过伪元素，我们可以控制 &lt;code&gt;shadow-dom&lt;/code&gt; 中 DOM 结构的样式。&lt;/p&gt;&lt;p&gt;在 chrome 下，查看 &lt;code&gt;shadow-dom&lt;/code&gt; 结构（如果无法看到shadow-dom需要手动打开），可以看到每个结点都加上了一个 pesudo 属性：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165335856-118242952.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;p&gt;有了这些属性，我们可以通过伪元素的方式控制他们，譬如在一些场景下 video 标签的控制条不会自动隐藏或自动显示，可以通过伪元素指定默认显隐方式：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/xOzqLR/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/xOzqLR/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;xOzqLR&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;.&lt;br&gt;&lt;/iframe&gt;&lt;p&gt;不幸的是，上面的控制方式只适用于 chrome 浏览器，虽然大部分现代浏览器已经支持 &lt;code&gt;shadow-dom&lt;/code&gt; ，但是能够审查 &lt;code&gt;shadow-dom&lt;/code&gt; 内部 DOM 元素的只有 &lt;code&gt;chrome&lt;/code&gt; 浏览器，其他浏览器仍会把这些细节隐藏。&lt;/p&gt;&lt;h3 id=&quot;使用-Javascript-创建一个-shadow-dom-元素&quot;&gt;&lt;a href=&quot;#使用-Javascript-创建一个-shadow-dom-元素&quot; class=&quot;headerlink&quot; title=&quot;使用 Javascript 创建一个 shadow-dom 元素&quot;&gt;&lt;/a&gt;使用 Javascript 创建一个 shadow-dom 元素&lt;/h3&gt;&lt;p&gt;我们也可以通常 Javascript 创建 &lt;code&gt;shadow-dom&lt;/code&gt; ，实现各类功能的封装，主要通过： &lt;code&gt;HTMLElement.prototype.createShadowRoot&lt;/code&gt;。&lt;/p&gt;&lt;p&gt;看看下面这个例子，在chrome内核浏览器下，将创建一个简单的 &lt;code&gt;shadow-dom&lt;/code&gt; ，将我们的代码放入一个 &lt;code&gt;template&lt;/code&gt; 中，再通过 &lt;code&gt;importNode&lt;/code&gt; 插入到 &lt;code&gt;shadow-dom&lt;/code&gt; 中:&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/JKkWzA/?height=265&amp;theme-id=0&amp;default-tab=js,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/JKkWzA/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;createShadowDomByJs&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;.&lt;br&gt;&lt;/iframe&gt;&lt;p&gt;如果你现在在 chrome 内核浏览器下访问本文，那么上述的 codePen 中你应该可以看到 createShadowDomByJs 这一行文字，打开审查元素，会看到 &lt;code&gt;&amp;lt;p&amp;gt;&lt;/code&gt; 结构是隐藏在 &lt;code&gt;shadow-dom&lt;/code&gt; 中的。&lt;/p&gt;&lt;h2 id=&quot;shadow-dom-兼容性&quot;&gt;&lt;a href=&quot;#shadow-dom-兼容性&quot; class=&quot;headerlink&quot; title=&quot;shadow-dom 兼容性&quot;&gt;&lt;/a&gt;shadow-dom 兼容性&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;http://images2015.cnblogs.com/blog/608782/201607/608782-20160727165454997-1596709004.png&quot; alt=&quot;image&quot;&gt;&lt;/p&gt;&lt;h2 id=&quot;shadow-dom-的未来&quot;&gt;&lt;a href=&quot;#shadow-dom-的未来&quot; class=&quot;headerlink&quot; title=&quot;shadow-dom 的未来&quot;&gt;&lt;/a&gt;shadow-dom 的未来&lt;/h2&gt;&lt;p&gt;本文是非常基本的一些关于 &lt;code&gt;shadow-dom&lt;/code&gt; 的概念，只是它的冰山一角，没有十分深入的去研究。&lt;/p&gt;&lt;p&gt;现行的组件都是开放式的，即最终生成的 HTML DOM 结构难以与组件外部的 DOM 进行有效结构区分，样式容易互相混淆。Shadow DOM 的 &lt;code&gt;封装隐藏性&lt;/code&gt;为我们提供了解决这些问题的方法。在 Web 组件化的规范中也可以看到 Shadow-dom 的身影，使用具有良好密封性的 Shadow-dom 开发下一代 Web 组件将会是一种趋势。&lt;/p&gt;&lt;h2 id=&quot;更多资源&quot;&gt;&lt;a href=&quot;#更多资源&quot; class=&quot;headerlink&quot; title=&quot;更多资源&quot;&gt;&lt;/a&gt;更多资源&lt;/h2&gt;&lt;p&gt;如果你读完本文后仍然意犹未尽，可以看看下面这些文章：&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;http://webcomponents.org/articles/introduction-to-shadow-dom/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Introduction to Shadow DOM&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://css-tricks.com/modular-future-web-components/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;A Guide to Web Components&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;http://www.html5rocks.com/zh/tutorials/webcomponents/shadowdom-201/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Shadow DOM 201&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;http://www.toobug.net/article/what_is_shadow_dom.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;[译]什么是Shadow Dom？&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;说到 shadow-dom 可能很多人会很陌生。但是其实我们肯定碰到过，本文主要想简单介绍下 &lt;code&gt;shadow-dom&lt;/code&gt;。下面直接进入正文。
+    
+    </summary>
+    
+    
+      <category term="javascript" scheme="http://sbco.cc/tags/javascript/"/>
+    
+      <category term="CSS" scheme="http://sbco.cc/tags/CSS/"/>
+    
+  </entry>
+  
+  <entry>
     <title>【CSS进阶】伪元素的妙用2 - 多列均匀布局及title属性效果</title>
     <link href="http://sbco.cc/2016/07/13/pesudo2/"/>
     <id>http://sbco.cc/2016/07/13/pesudo2/</id>
     <published>2016-07-13T07:31:34.000Z</published>
-    <updated>2016-07-13T10:11:09.900Z</updated>
+    <updated>2016-07-13T11:25:51.905Z</updated>
     
-    <content type="html">&lt;p&gt;最近无论是工作还是自我学习提升都很忙，面对长篇大论的博文总是心有余而力不足，但又不断的接触学习到零碎的但是很有意义的知识点，很想分享给大家，所以本篇可能会很短。
-  &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;
-&lt;/p&gt;
-&lt;p&gt;本篇接我另一篇讲述 CSS 伪元素的文章：
-  &lt;a href=&quot;http://www.cnblogs.com/coco1s/p/5528393.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;【CSS进阶】伪元素的妙用–单标签之美&lt;/a&gt;，看完本文觉得有意思的可以再去看看上一篇，分享了一些伪元素的妙用。&lt;/p&gt;
-&lt;p&gt;正文从这里开始：&lt;/p&gt;
-&lt;h2 id=&quot;哪些标签不支持伪元素？&quot;&gt;
-  &lt;a href=&quot;#哪些标签不支持伪元素？&quot; class=&quot;headerlink&quot; title=&quot;哪些标签不支持伪元素？&quot;&gt;&lt;/a&gt;哪些标签不支持伪元素？&lt;/h2&gt;
-&lt;p&gt;我也是才知道这个姿势。为了不误导读者，就赶紧补充一下。&lt;/p&gt;
-&lt;p&gt;伪元素虽然强大，但是还是有一些特定的标签是不支持伪元素 before 和 after 的。&lt;/p&gt;
-&lt;p&gt;诸如
-  &lt;code&gt;&amp;lt;img\&amp;gt;&lt;/code&gt; 、
-  &lt;code&gt;&amp;lt;input\&amp;gt;&lt;/code&gt;、
-  &lt;code&gt;&amp;lt;iframe\&amp;gt;&lt;/code&gt;，这几个标签是不支持类似 img::before 这样使用。&lt;/p&gt;
-&lt;p&gt;究其原因，要想要标签支持伪元素，需要这个元素是要可以插入内容的，也就是说这个元素要是一个容器。而 input，img，iframe 等元素都不能包含其他元素，所以不能通过伪元素插入内容。&lt;/p&gt;
-&lt;h2 id=&quot;纯CSS实现title属性hover效果&quot;&gt;
-  &lt;a href=&quot;#纯CSS实现title属性hover效果&quot; class=&quot;headerlink&quot; title=&quot;纯CSS实现title属性hover效果&quot;&gt;&lt;/a&gt;纯CSS实现title属性hover效果&lt;/h2&gt;
-  &lt;p&gt;我们都知道，在 HTML 标签中有这样一个属性 – title，该属性规定关于元素的额外信息，就是我们可以往 title 里面填入一段文字，鼠标移到元素上时就会显示这段文本。&lt;/p&gt;
-  &lt;p&gt;像是这样
-    &lt;code&gt;&amp;lt;element title=&amp;quot;value&amp;quot; &amp;gt;&lt;/code&gt;。效果如下：&lt;/p&gt;
-  &lt;p&gt;
-    &lt;img src=&quot;../../../../images/post/pesudo2/hover.gif&quot; alt=&quot;传统title hover效果&quot;&gt;;&lt;/p&gt;
-  &lt;p&gt;但是这个 hover 框有两个小问题：&lt;/p&gt;
-  &lt;ul&gt;
-    &lt;li&gt;
-      &lt;p&gt;响应太慢，通常鼠标 hover 上去要隔 1s 左右才会出现这个 title 框&lt;/p&gt;
-    &lt;/li&gt;
-    &lt;li&gt;
-      &lt;p&gt;框体结构无法自定义，弹出框的样式无法自定义&lt;/p&gt;
-    &lt;/li&gt;
-  &lt;/ul&gt;
-  &lt;p&gt;嗯，通常要解决上面的方法，或者说我们需要一个鼠标 hover 上去的时候弹出一个提示层的效果都不会采用 title 属性，而是配合使用 JS 模拟一个弹出层。&lt;/p&gt;
-  &lt;p&gt;这里有一个纯 CSS 的方案可以解决这个场景，运用了伪元素，先上 Demo：&lt;/p&gt;
-  &lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/yJPENQ/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen
-    &lt;a href=&quot;http://codepen.io/Chokcoco/pen/yJPENQ/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hoverTitle&lt;/a&gt; by Chokcoco (
-    &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on
-    &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;
-  &lt;/iframe&gt;
-  &lt;p&gt;鼠标 hover 一下文字，发现弹出层响应十分迅速（因为就是 CSS hover，没有延迟）。并且这里的弹出层的样式也可以完全自定义，没有用到 JS 代码，并且查看
-    HTML 代码可以看到不需要多余的标签。&lt;/p&gt;
-  &lt;p&gt;怎么实现的呢？主要是运用了伪元素的
-    &lt;code&gt;content&lt;/code&gt; 属性，
-    &lt;code&gt;content&lt;/code&gt; 通常是用于在伪元素中插入内容的。而其中有一句语法
-    &lt;code&gt;content: attr(value)&lt;/code&gt; 类似这样，可以读取对应 HTML 标签的
-    &lt;code&gt;value&lt;/code&gt; 属性。也就是：&lt;/p&gt;
-  &lt;ol&gt;
-    &lt;li&gt;
-      &lt;p&gt;假设一个 HTML 标签定义为：
-        &lt;code&gt;&amp;lt;div data-msg=&amp;quot;ABC&amp;quot;&amp;gt;&lt;/code&gt;
-      &lt;/p&gt;
-    &lt;/li&gt;
-    &lt;li&gt;
-      &lt;p&gt;那么该 div 对应的伪类如果设置了
-        &lt;code&gt;content:attr(data-msg)&lt;/code&gt; ，就可以读取到 data-msg 的值，相当于
-        &lt;code&gt;content:&amp;quot;ABC&amp;quot;&lt;/code&gt;
-      &lt;/p&gt;
-    &lt;/li&gt;
-  &lt;/ol&gt;
-  &lt;p&gt;而且框体由于是伪类生成的，所以我们可以自定义它的样式及位置，运用这个效果，我们应用在可以在许多无法正常把信息展示完的地方。&lt;/p&gt;
-  &lt;h2 id=&quot;借用伪元素实现多列均匀布局&quot;&gt;
-    &lt;a href=&quot;#借用伪元素实现多列均匀布局&quot; class=&quot;headerlink&quot; title=&quot;借用伪元素实现多列均匀布局&quot;&gt;&lt;/a&gt;借用伪元素实现多列均匀布局&lt;/h2&gt;
-  &lt;p&gt;我们经常需要实现多列均匀布局，能够自适应各种情况，如下：&lt;/p&gt;
-  &lt;p&gt;
-    &lt;img src=&quot;../../../../images/post/pesudo2/justifyLayout.png&quot; alt=&quot;多列均匀布局&quot;&gt;;&lt;/p&gt;
-  &lt;p&gt;在移动端我们可以使用 flex 布局，但是在 PC 端如果要兼容 IE6+ ，通常都需要一些额外的标签控制最后一个元素或者配合 JS 进行运算。&lt;/p&gt;
-  &lt;p&gt;我们知道，有个
-    &lt;code&gt;text-align:justify&lt;/code&gt; 可以实现两端对齐文本效果，一开始我猜测使用它可以实现：&lt;/p&gt;
-  &lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/AXbgbq/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen
-    &lt;a href=&quot;http://codepen.io/Chokcoco/pen/AXbgbq/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;AXbgbq&lt;/a&gt; by Chokcoco (
-    &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on
-    &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;
-  &lt;/iframe&gt;
-  &lt;p&gt;试了一下是不行的，并没有实现所谓的两端对齐，查找原因，在
-    &lt;a href=&quot;http://www.w3school.com.cn/cssref/pr_text_text-align.asp&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;W3C&lt;/a&gt; 找到这样一段解释:&lt;/p&gt;
-  &lt;p&gt;最后一个水平对齐属性是 justify，它会带来自己的一些问题。CSS 中没有说明如何处理连字符，因为不同的语言有不同的连字符规则。规范没有尝试去调和这样一些很可能不完备的规则，而是干脆不提这个问题。&lt;/p&gt;
-  &lt;p&gt;额，我看完上面一大段解释还是没明白上面意思，再继续查证，才找到原因：&lt;/p&gt;
-  &lt;p&gt;虽然 text-align:justify 属性是全兼容的，但是要使用它实现两端对齐，需要注意在模块之间添加[空格/换行符/制表符]才能起作用。&lt;/p&gt;
-  &lt;p&gt;也就是说每一个
-    &lt;code&gt;&amp;lt;i&amp;gt;1&amp;lt;/i&amp;gt;&lt;/code&gt; 间隙，至少需要有一个空格或者换行或者制表符才行。&lt;/p&gt;
-  &lt;p&gt;我尝试给每一块中间添加一个换行符，发现还是不行：&lt;/p&gt;
-  &lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/qNVyKY/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen
-    &lt;a href=&quot;http://codepen.io/Chokcoco/pen/qNVyKY/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;qNVyKY&lt;/a&gt; by Chokcoco (
-    &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on
-    &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;
-  &lt;/iframe&gt;
-  &lt;p&gt;再寻找原因，是出在最后一个元素上面，然后我找到了
-    &lt;code&gt;text-align-last&lt;/code&gt; 这个属性，text-align-last 属性规定如何对齐文本的最后一行，并且 text-align-last
-    属性只有在 text-align 属性设置为 “justify” 时才起作用。&lt;/p&gt;
-  &lt;p&gt;尝试给容器添加
-    &lt;code&gt;text-align-last:justify&lt;/code&gt;，发现终于可以了，多列均匀布局：&lt;/p&gt;
-  &lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/rLYAkj/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen
-    &lt;a href=&quot;http://codepen.io/Chokcoco/pen/rLYAkj/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;rLYAkj&lt;/a&gt; by Chokcoco (
-    &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on
-    &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;
-  &lt;/iframe&gt;
-  &lt;p&gt;但是一看兼容性，惨不忍睹，只有 IE 和 最新的 chrome 支持 text-align-last 属性，也就是说，如果你不是在使用 IE 或者 最新版的
-    chrome 观看本文，上面这个 codePen 例子还是没有均匀分布。&lt;/p&gt;
-  &lt;p&gt;好，铺垫了这么久，终于可以引出本文的主角伪元素了，上面说了要使用
-    &lt;code&gt;text-align:justify&lt;/code&gt; 实现多列布局，要配合
-    &lt;code&gt;text-align-last&lt;/code&gt; ，但是它的兼容性又不好，真的没办法了么，其实还是有的，使用伪元素，可以完美实现：&lt;/p&gt;
-  &lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/grXgXy/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen
-    &lt;a href=&quot;http://codepen.io/Chokcoco/pen/grXgXy/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;justifyLayout&lt;/a&gt; by Chokcoco (
-    &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on
-    &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;
-  &lt;/iframe&gt;
-  &lt;p&gt;通过给伪元素 :after 设置
-    &lt;code&gt;inline-block&lt;/code&gt; ，配合容器的
-    &lt;code&gt;text-align: justify&lt;/code&gt; 就可以轻松实现多列均匀布局了。配合几句 hack 代码，可以实现兼容到 IE6+ ，最重要的是代码不长，很好理解。&lt;/p&gt;
-  &lt;p&gt;本文主要就是多介绍了伪元素的两种实用方法，更多伪元素的妙用可以戳
-    &lt;br&gt;
-    &lt;a href=&quot;http://chokcoco.github.io/magicCss/html/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CSS3奇思妙想，采用单标签完成各种图案 – Demo&lt;/a&gt; （请用 Chrome 浏览器打开，非常值得一看）。&lt;/p&gt;
-  &lt;p&gt;我另一篇讲述 CSS 伪元素的文章：
-    &lt;a href=&quot;http://www.cnblogs.com/coco1s/p/5528393.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;【CSS进阶】伪元素的妙用–单标签之美&lt;/a&gt;，看完本文觉得有意思的可以再去看看上一篇。&lt;/p&gt;
-  &lt;p&gt;也希望觉得不错的同学顺手在我的 Github 点个 star ：
-    &lt;a href=&quot;https://github.com/chokcoco/magicCss&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CSS3奇思妙想&lt;/a&gt; 。&lt;/p&gt;
-  &lt;p&gt;希望这篇文章对大家有所帮助，尤其是在对问题解决的思维层面上。&lt;/p&gt;
-  &lt;p&gt;到此本文结束，如果还有什么疑问或者建议，可以多多交流，原创文章，文笔有限，才疏学浅，文中若有不正之处，万望告知。&lt;/p&gt;
-</content>
+    <content type="html">&lt;p&gt;最近无论是工作还是自我学习提升都很忙，面对长篇大论的博文总是心有余而力不足，但又不断的接触学习到零碎的但是很有意义的知识点，很想分享给大家，所以本篇可能会很短。&lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;本篇接我另一篇讲述 CSS 伪元素的文章： &lt;a href=&quot;http://www.cnblogs.com/coco1s/p/5528393.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;【CSS进阶】伪元素的妙用–单标签之美&lt;/a&gt;，看完本文觉得有意思的可以再去看看上一篇，分享了一些伪元素的妙用。&lt;/p&gt;&lt;p&gt;正文从这里开始：&lt;/p&gt;&lt;h2 id=&quot;哪些标签不支持伪元素？&quot;&gt;&lt;a href=&quot;#哪些标签不支持伪元素？&quot; class=&quot;headerlink&quot; title=&quot;哪些标签不支持伪元素？&quot;&gt;&lt;/a&gt;哪些标签不支持伪元素？&lt;/h2&gt;&lt;p&gt;我也是才知道这个姿势。为了不误导读者，就赶紧补充一下。&lt;/p&gt;&lt;p&gt;伪元素虽然强大，但是还是有一些特定的标签是不支持伪元素 before 和 after 的。&lt;/p&gt;&lt;p&gt;诸如 &lt;code&gt;&amp;lt;img\&amp;gt;&lt;/code&gt; 、 &lt;code&gt;&amp;lt;input\&amp;gt;&lt;/code&gt;、 &lt;code&gt;&amp;lt;iframe\&amp;gt;&lt;/code&gt;，这几个标签是不支持类似 img::before 这样使用。&lt;/p&gt;&lt;p&gt;究其原因，要想要标签支持伪元素，需要这个元素是要可以插入内容的，也就是说这个元素要是一个容器。而 input，img，iframe 等元素都不能包含其他元素，所以不能通过伪元素插入内容。&lt;/p&gt;&lt;h2 id=&quot;纯CSS实现title属性hover效果&quot;&gt;&lt;a href=&quot;#纯CSS实现title属性hover效果&quot; class=&quot;headerlink&quot; title=&quot;纯CSS实现title属性hover效果&quot;&gt;&lt;/a&gt;纯CSS实现title属性hover效果&lt;/h2&gt;&lt;p&gt;我们都知道，在 HTML 标签中有这样一个属性 – title，该属性规定关于元素的额外信息，就是我们可以往 title 里面填入一段文字，鼠标移到元素上时就会显示这段文本。&lt;/p&gt;&lt;p&gt;像是这样 &lt;code&gt;&amp;lt;element title=&amp;quot;value&amp;quot; &amp;gt;&lt;/code&gt;。效果如下：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;../../../../images/post/pesudo2/hover.gif&quot; alt=&quot;传统title hover效果&quot;&gt;;&lt;/p&gt;&lt;p&gt;但是这个 hover 框有两个小问题：&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;响应太慢，通常鼠标 hover 上去要隔 1s 左右才会出现这个 title 框&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;框体结构无法自定义，弹出框的样式无法自定义&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;嗯，通常要解决上面的方法，或者说我们需要一个鼠标 hover 上去的时候弹出一个提示层的效果都不会采用 title 属性，而是配合使用 JS 模拟一个弹出层。&lt;/p&gt;&lt;p&gt;这里有一个纯 CSS 的方案可以解决这个场景，运用了伪元素，先上 Demo：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/yJPENQ/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/yJPENQ/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;hoverTitle&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;&lt;/iframe&gt;&lt;p&gt;鼠标 hover 一下文字，发现弹出层响应十分迅速（因为就是 CSS hover，没有延迟）。并且这里的弹出层的样式也可以完全自定义，没有用到 JS 代码，并且查看 HTML 代码可以看到不需要多余的标签。&lt;/p&gt;&lt;p&gt;怎么实现的呢？主要是运用了伪元素的 &lt;code&gt;content&lt;/code&gt; 属性， &lt;code&gt;content&lt;/code&gt; 通常是用于在伪元素中插入内容的。而其中有一句语法 &lt;code&gt;content: attr(value)&lt;/code&gt; 类似这样，可以读取对应 HTML 标签的 &lt;code&gt;value&lt;/code&gt; 属性。也就是：&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;p&gt;假设一个 HTML 标签定义为： &lt;code&gt;&amp;lt;div data-msg=&amp;quot;ABC&amp;quot;&amp;gt;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;那么该 div 对应的伪类如果设置了 &lt;code&gt;content:attr(data-msg)&lt;/code&gt; ，就可以读取到 data-msg 的值，相当于 &lt;code&gt;content:&amp;quot;ABC&amp;quot;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;而且框体由于是伪类生成的，所以我们可以自定义它的样式及位置，运用这个效果，我们应用在可以在许多无法正常把信息展示完的地方。&lt;/p&gt;&lt;h2 id=&quot;借用伪元素实现多列均匀布局&quot;&gt;&lt;a href=&quot;#借用伪元素实现多列均匀布局&quot; class=&quot;headerlink&quot; title=&quot;借用伪元素实现多列均匀布局&quot;&gt;&lt;/a&gt;借用伪元素实现多列均匀布局&lt;/h2&gt;&lt;p&gt;我们经常需要实现多列均匀布局，能够自适应各种情况，如下：&lt;/p&gt;&lt;p&gt;&lt;img src=&quot;../../../../images/post/pesudo2/justifyLayout.png&quot; alt=&quot;多列均匀布局&quot;&gt;;&lt;/p&gt;&lt;p&gt;在移动端我们可以使用 flex 布局，但是在 PC 端如果要兼容 IE6+ ，通常都需要一些额外的标签控制最后一个元素或者配合 JS 进行运算。&lt;/p&gt;&lt;p&gt;我们知道，有个 &lt;code&gt;text-align:justify&lt;/code&gt; 可以实现两端对齐文本效果，一开始我猜测使用它可以实现：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/AXbgbq/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/AXbgbq/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;AXbgbq&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;&lt;/iframe&gt;&lt;p&gt;试了一下是不行的，并没有实现所谓的两端对齐，查找原因，在 &lt;a href=&quot;http://www.w3school.com.cn/cssref/pr_text_text-align.asp&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;W3C&lt;/a&gt; 找到这样一段解释:&lt;/p&gt;&lt;p&gt;最后一个水平对齐属性是 justify，它会带来自己的一些问题。CSS 中没有说明如何处理连字符，因为不同的语言有不同的连字符规则。规范没有尝试去调和这样一些很可能不完备的规则，而是干脆不提这个问题。&lt;/p&gt;&lt;p&gt;额，我看完上面一大段解释还是没明白上面意思，再继续查证，才找到原因：&lt;/p&gt;&lt;p&gt;虽然 text-align:justify 属性是全兼容的，但是要使用它实现两端对齐，需要注意在模块之间添加[空格/换行符/制表符]才能起作用。&lt;/p&gt;&lt;p&gt;也就是说每一个 &lt;code&gt;&amp;lt;i&amp;gt;1&amp;lt;/i&amp;gt;&lt;/code&gt; 间隙，至少需要有一个空格或者换行或者制表符才行。&lt;/p&gt;&lt;p&gt;我尝试给每一块中间添加一个换行符，发现还是不行：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/qNVyKY/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/qNVyKY/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;qNVyKY&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;&lt;/iframe&gt;&lt;p&gt;再寻找原因，是出在最后一个元素上面，然后我找到了 &lt;code&gt;text-align-last&lt;/code&gt; 这个属性，text-align-last 属性规定如何对齐文本的最后一行，并且 text-align-last 属性只有在 text-align 属性设置为 “justify” 时才起作用。&lt;/p&gt;&lt;p&gt;尝试给容器添加 &lt;code&gt;text-align-last:justify&lt;/code&gt;，发现终于可以了，多列均匀布局：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/rLYAkj/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/rLYAkj/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;rLYAkj&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;&lt;/iframe&gt;&lt;p&gt;但是一看兼容性，惨不忍睹，只有 IE 和 最新的 chrome 支持 text-align-last 属性，也就是说，如果你不是在使用 IE 或者 最新版的 chrome 观看本文，上面这个 codePen 例子还是没有均匀分布。&lt;/p&gt;&lt;p&gt;好，铺垫了这么久，终于可以引出本文的主角伪元素了，上面说了要使用 &lt;code&gt;text-align:justify&lt;/code&gt; 实现多列布局，要配合 &lt;code&gt;text-align-last&lt;/code&gt; ，但是它的兼容性又不好，真的没办法了么，其实还是有的，使用伪元素，可以完美实现：&lt;/p&gt;&lt;iframe height=&quot;265&quot; scrolling=&quot;no&quot; src=&quot;//codepen.io/Chokcoco/embed/grXgXy/?height=265&amp;theme-id=0&amp;default-tab=css,result&amp;embed-version=2&quot; frameborder=&quot;no&quot; allowtransparency=&quot;true&quot; allowfullscreen style=&quot;width:100%&quot;&gt;See the Pen &lt;a href=&quot;http://codepen.io/Chokcoco/pen/grXgXy/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;justifyLayout&lt;/a&gt; by Chokcoco ( &lt;a href=&quot;http://codepen.io/Chokcoco&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;@Chokcoco&lt;/a&gt;) on &lt;a href=&quot;http://codepen.io&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CodePen&lt;/a&gt;&lt;/iframe&gt;&lt;p&gt;通过给伪元素 :after 设置 &lt;code&gt;inline-block&lt;/code&gt; ，配合容器的 &lt;code&gt;text-align: justify&lt;/code&gt; 就可以轻松实现多列均匀布局了。配合几句 hack 代码，可以实现兼容到 IE6+ ，最重要的是代码不长，很好理解。&lt;/p&gt;&lt;p&gt;本文主要就是多介绍了伪元素的两种实用方法，更多伪元素的妙用可以戳&lt;br&gt;&lt;a href=&quot;http://chokcoco.github.io/magicCss/html/index.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CSS3奇思妙想，采用单标签完成各种图案 – Demo&lt;/a&gt; （请用 Chrome 浏览器打开，非常值得一看）。&lt;/p&gt;&lt;p&gt;我另一篇讲述 CSS 伪元素的文章： &lt;a href=&quot;http://www.cnblogs.com/coco1s/p/5528393.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;【CSS进阶】伪元素的妙用–单标签之美&lt;/a&gt;，看完本文觉得有意思的可以再去看看上一篇。&lt;/p&gt;&lt;p&gt;也希望觉得不错的同学顺手在我的 Github 点个 star ： &lt;a href=&quot;https://github.com/chokcoco/magicCss&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CSS3奇思妙想&lt;/a&gt; 。&lt;/p&gt;&lt;p&gt;希望这篇文章对大家有所帮助，尤其是在对问题解决的思维层面上。&lt;/p&gt;&lt;p&gt;到此本文结束，如果还有什么疑问或者建议，可以多多交流，原创文章，文笔有限，才疏学浅，文中若有不正之处，万望告知。&lt;/p&gt;</content>
     
     <summary type="html">
     

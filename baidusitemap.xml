@@ -4,8 +4,27 @@
 
     
   <url>
+    <loc>http://sbco.cc/2016/07/27/shadowDom/</loc>
+    <lastmod>2016-07-27T09:07:46.303Z</lastmod>
+    <data>
+        <display>
+        <title>shadow-dom 浅析</title>
+        <pubTime>2016-07-27T08:29:34.000Z</pubTime>
+        
+        <tag>javascript</tag>
+         
+        <tag>CSS</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://sbco.cc/2016/07/13/pesudo2/</loc>
-    <lastmod>2016-07-13T10:11:09.900Z</lastmod>
+    <lastmod>2016-07-13T11:25:51.905Z</lastmod>
     <data>
         <display>
         <title>【CSS进阶】伪元素的妙用2 - 多列均匀布局及title属性效果</title>

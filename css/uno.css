@@ -1725,3 +1725,16 @@ th, td {
 .friendLink ul li a:hover{
   color:#006699;
 }
+.highlight .gutter{
+  display:none;
+}
+.highlight br{
+  height: 0;
+  overflow: hidden;
+  display: none;
+}
+.article-content .highlight .line {
+  height: 20px;
+  line-height: 20px;
+  text-indent: 20px;
+}
