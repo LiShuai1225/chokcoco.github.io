@@ -1,1 +1,11 @@
-(function(){for(var t=0;t<360;t+=22.5){var e=document.createElementNS("http://www.w3.org/2000/svg","use");e.setAttributeNS("http://www.w3.org/1999/xlink","href","#petal");e.setAttribute("fill","hsla("+t+", 62%, 80%, .35)");e.setAttribute("transform","rotate("+t+" 50 50)");document.querySelector(".svg-lotus").appendChild(e)}})();
+(function() {
+	for (var i = 0; i < 360; i += 22.5) {
+		var useElement = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+
+		useElement.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#petal');
+		useElement.setAttribute('fill', 'hsla(' + i + ', 62%, 80%, .35)');
+		useElement.setAttribute('transform', 'rotate(' + i + ' 50 50)');
+
+		document.querySelector('.svg-lotus').appendChild(useElement);
+	}
+})();
