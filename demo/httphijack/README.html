@@ -1,0 +1,4 @@
+<h1 id="httphijack"><a href="#httphijack" class="headerlink" title="httphijack"></a>httphijack</h1><p>使用Javascript实现前端防御http劫持及防御XSS攻击，并且对可疑攻击进行上报</p><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>引入 <code>httphijack1.0.0.js</code></p><pre>
+  <code class="javascript">httphijack.init()
+  </code>
+</pre><h2 id="防范范围："><a href="#防范范围：" class="headerlink" title="防范范围："></a>防范范围：</h2><ul><li>所有内联事件执行的代码</li><li><a>标签 href 属性 <code>javascript:</code> 内嵌的代码</a></li><li>静态脚本文件内容</li><li>动态添加的脚本文件内容</li><li>document-write添加的内容</li><li>iframe嵌套</li></ul><h2 id="使用须知"><a href="#使用须知" class="headerlink" title="使用须知"></a>使用须知</h2><p>建立自己的黑白名单、上报系统及接收后端</p><h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>MIT</p>

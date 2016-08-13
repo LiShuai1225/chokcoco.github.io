@@ -1,4 +1,1 @@
-;/*!/static/js/solarSystem.js*/
-(function(win,undefined){
-
-})(window);
+(function(n,i){})(window);

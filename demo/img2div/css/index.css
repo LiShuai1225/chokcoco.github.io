@@ -50,14 +50,14 @@ h2 {
   padding: 2em;
 }
 
-.dropZone> div {
+.dropZone > div {
   margin-top: 50px;
   width: 100%;
   line-height: 2;
   text-align: center;
 }
 
-.dropZone> input {
+.dropZone > input {
   cursor: pointer;
   display: block;
 }
