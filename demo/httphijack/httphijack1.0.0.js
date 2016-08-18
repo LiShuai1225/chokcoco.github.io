@@ -30,7 +30,8 @@
   // 建立白名单
   var whiteList = [
     'www.aaa.com',
-    'www.bbb.com'
+    'www.bbb.com',
+    's4.cnzz.com'
   ];
 
   // 建立黑名单
