@@ -22,8 +22,9 @@ body {
 }
 
 .container .stage .control {
-  transform: translateZ(350px) rotateY(50deg) rotateZ(0deg);
+  transform: translateZ(-3000px) rotateY(50deg) rotateZ(0deg);
   transform-style: preserve-3d;
+  animation: photoRotate 10s linear infinite;
 }
 
 .container .stage .imgWrap {
@@ -35,7 +36,6 @@ body {
   transition: transform 1s;
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
-  animation: photoRotate 20s linear infinite;
 }
 
 .container .stage .imgWrap > div {
@@ -175,11 +175,11 @@ body {
 
 @keyframes photoRotate {
   0% {
-    -webkit-transform: rotateY(0deg);
-    transform: rotateY(0deg);
+    -webkit-transform: translateZ(-3000px) rotateY(0deg) rotateZ(0deg);
+    transform: translateZ(-3000px) rotateY(0deg) rotateZ(0deg);
   }
   100% {
-    -webkit-transform: rotateY(360deg);
-    transform: rotateY(360deg);
+    -webkit-transform: translateZ(-3000px) rotateY(360deg) rotateZ(0deg);
+    transform: translateZ(-3000px) rotateY(360deg) rotateZ(0deg);
   }
 }
