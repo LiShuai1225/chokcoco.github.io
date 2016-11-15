@@ -1,1 +1,1 @@
-console.log('normal js');
+console.log("normal js");

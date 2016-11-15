@@ -1,1 +1,1 @@
-(function(n,i){})(window);
+!function(n,i){}(window);
